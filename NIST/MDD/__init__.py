@@ -8,6 +8,7 @@ from future.builtins import super
 from PIL import Image
 
 from MDmisc.string import split_r
+from SoftPillow import MyImageDraw
 
 from ..fingerprint import NISTf
 from ..traditional.config import RS
@@ -101,4 +102,30 @@ class NIST_MDD( NISTf ):
         
         ########################################################################
         
+    def annotate_ROI( self, *args, **kwargs ):
+        """
+             
+        """
+        from pprint import pprint
+        pprint( kwargs )
+         
+        img = kwargs.pop( "img" )
+        center = kwargs.pop( "center", ( 0, 0 ) )
+        size = kwargs.pop( "size", ( 2540, 2540 ) )
+        idc = kwargs.pop( "idc", -1 )
+     
+        img = img.convert( "RGB" )
+        dr = MyImageDraw( img )
+        
+        width, height = img.size
+        
+        cx, cy = center
+        cx *= 100
+        cy *= 100
+         
+        ho, vo, w, h = ( cx - 1270, cy - 1270, size[ 0 ], size[ 1 ] )
+        w, h, ho, vo = map( lambda x: ( int( x ) / 100.0 * self.get_resolution( idc ) / 25.4 ), [ w, h, ho, vo ] )
+         
+        dr.rectangle( ( ho, vo, ho + w, vo + h ), outline = "red", width = 3 )
+         
         return img
